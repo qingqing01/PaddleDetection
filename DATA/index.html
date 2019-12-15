@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  <link rel="shortcut icon" href="../img/favicon.ico">
+  <title>DATA - PaddleDetection Docs</title>
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "DATA";
+    var mkdocs_page_input_path = "DATA.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> PaddleDetection Docs</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="current">
+	  
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../index.md">Home</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../docs/INSTALL.md">Installation</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../docs/QUICK_STARTED.md">Quick start</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../docs/MODEL_ZOO.md">Modle Zoo</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <span class="caption-text">Deployment</span>
+    <ul class="subnav">
+                <li class="">
+                    
+    <a class="" href="../docs/EXPORT_MODEL.md">Export model</a>
+                </li>
+    </ul>
+	    </li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">PaddleDetection Docs</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>DATA</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <p>English | <a href="../DATA_cn/">简体中文</a></p>
+<h1 id="data-pipline">Data Pipline</h1>
+<h2 id="introduction">Introduction</h2>
+<p>The data pipeline is responsible for loading and converting data. Each
+resulting data sample is a tuple of np.ndarrays.
+For example, Faster R-CNN training uses samples of this format: <code>[(im,
+im_info, im_id, gt_bbox, gt_class, is_crowd), (...)]</code>.</p>
+<h3 id="implementation">Implementation</h3>
+<p>The data pipeline consists of four sub-systems: data parsing, image
+pre-processing, data conversion and data feeding APIs.</p>
+<p>Data samples are collected to form <code>data.Dataset</code>s, usually 3 sets are
+needed for training, validation, and testing respectively.</p>
+<p>First, <code>data.source</code> loads the data files into memory, then
+<code>data.transform</code> processes them, and lastly, the batched samples
+are fetched by <code>data.Reader</code>.</p>
+<p>Sub-systems details:
+1. Data parsing
+Parses various data sources and creates <code>data.Dataset</code> instances. Currently,
+following data sources are supported:</p>
+<ul>
+<li>COCO data source</li>
+</ul>
+<p>Loads <code>COCO</code> type datasets with directory structures like this:</p>
+<p><code>dataset/coco/
+  ├── annotations
+  │   ├── instances_train2014.json
+  │   ├── instances_train2017.json
+  │   ├── instances_val2014.json
+  │   ├── instances_val2017.json
+  │   |   ...
+  ├── train2017
+  │   ├── 000000000009.jpg
+  │   ├── 000000580008.jpg
+  │   |   ...
+  ├── val2017
+  │   ├── 000000000139.jpg
+  │   ├── 000000000285.jpg
+  │   |   ...
+  |   ...</code></p>
+<ul>
+<li>Pascal VOC data source</li>
+</ul>
+<p>Loads <code>Pascal VOC</code> like datasets with directory structure like this:</p>
+<p><code>dataset/voc/
+  ├── train.txt
+  ├── val.txt
+  ├── test.txt
+  ├── label_list.txt (optional)
+  ├── VOCdevkit/VOC2007
+  │   ├── Annotations
+  │       ├── 001789.xml
+  │       |   ...
+  │   ├── JPEGImages
+  │       ├── 001789.xml
+  │       |   ...
+  │   ├── ImageSets
+  │       |   ...
+  ├── VOCdevkit/VOC2012
+  │   ├── Annotations
+  │       ├── 003876.xml
+  │       |   ...
+  │   ├── JPEGImages
+  │       ├── 003876.xml
+  │       |   ...
+  │   ├── ImageSets
+  │       |   ...
+  |   ...</code></p>
+<p><strong>NOTE:</strong> If you set <code>use_default_label=False</code> in yaml configs, the <code>label_list.txt</code>
+of Pascal VOC dataset will be read, otherwise, <code>label_list.txt</code> is unnecessary and
+the default Pascal VOC label list which defined in
+<a href="../ppdet/data/source/voc_loader.py">voc_loader.py</a> will be used.</p>
+<ul>
+<li>Roidb data source
+A generalized data source serialized as pickle files, which have the following
+structure:</li>
+</ul>
+<pre><code class="python">(records, cname2id)
+# `cname2id` is a `dict` which maps category name to class IDs
+# and `records` is a list of dict of this structure:
+{
+    'im_file': im_fname,    # image file name
+    'im_id': im_id,         # image ID
+    'h': im_h,              # height of image
+    'w': im_w,              # width of image
+    'is_crowd': is_crowd,   # crowd marker
+    'gt_class': gt_class,   # ground truth class
+    'gt_bbox': gt_bbox,     # ground truth bounding box
+    'gt_poly': gt_poly,     # ground truth segmentation
+}
+</code></pre>
+
+<p>We provide a tool to generate roidb data sources. To convert <code>COCO</code> or <code>VOC</code>
+like dataset, run this command:</p>
+<pre><code class="sh"># --type: the type of original data (xml or json)
+# --annotation: the path of file, which contains the name of annotation files
+# --save-dir: the save path
+# --samples: the number of samples (default is -1, which mean all datas in dataset)
+python ./ppdet/data/tools/generate_data_for_training.py
+            --type=json \
+            --annotation=./annotations/instances_val2017.json \
+            --save-dir=./roidb \
+            --samples=-1
+</code></pre>
+
+<ol>
+<li>
+<p>Image preprocessing
+the <code>data.transform.operator</code> module provides operations such as image
+decoding, expanding, cropping, etc. Multiple operators are combined to form
+larger processing pipelines.</p>
+</li>
+<li>
+<p>Data transformer
+Transform a <code>data.Dataset</code> to achieve various desired effects, Notably: the
+<code>data.transform.paralle_map</code> transformer accelerates image processing with
+multi-threads or multi-processes. More transformers can be found in
+<code>data.transform.transformer</code>.</p>
+</li>
+<li>
+<p>Data feeding apis
+To facilitate data pipeline building, we combine multiple <code>data.Dataset</code> to
+form a <code>data.Reader</code> which can provide data for training, validation and
+testing respectively. Users can simply call <code>Reader.[train|eval|infer]</code> to get
+the corresponding data stream. Many aspect of the <code>Reader</code>, such as storage
+location, preprocessing pipeline, acceleration mode can be configured with yaml
+files.</p>
+</li>
+</ol>
+<h3 id="apis">APIs</h3>
+<p>The main APIs are as follows:</p>
+<ol>
+<li>
+<p>Data parsing</p>
+</li>
+<li>
+<p><code>source/coco_loader.py</code>: COCO dataset parser. <a href="../ppdet/data/source/coco_loader.py">source</a></p>
+</li>
+<li><code>source/voc_loader.py</code>: Pascal VOC dataset parser. <a href="../ppdet/data/source/voc_loader.py">source</a>
+ [Note] To use a non-default label list for VOC datasets, a <code>label_list.txt</code>
+ file is needed, one can use the provided label list
+ (<code>data/pascalvoc/ImageSets/Main/label_list.txt</code>) or generate a custom one (with <code>tools/generate_data_for_training.py</code>). Also, <code>use_default_label</code> option should
+ be set to <code>false</code> in the configuration file</li>
+<li>
+<p><code>source/loader.py</code>: Roidb dataset parser. <a href="../ppdet/data/source/loader.py">source</a></p>
+</li>
+<li>
+<p>Operator
+ <code>transform/operators.py</code>: Contains a variety of data augmentation methods, including:</p>
+</li>
+<li><code>DecodeImage</code>: Read images in RGB format.</li>
+<li><code>RandomFlipImage</code>: Horizontal flip.</li>
+<li><code>RandomDistort</code>: Distort brightness, contrast, saturation, and hue.</li>
+<li><code>ResizeImage</code>: Resize image with interpolation.</li>
+<li><code>RandomInterpImage</code>: Use a random interpolation method to resize the image.</li>
+<li><code>CropImage</code>: Crop image with respect to different scale, aspect ratio, and overlap.</li>
+<li><code>ExpandImage</code>: Pad image to a larger size, padding filled with mean image value.</li>
+<li><code>NormalizeImage</code>: Normalize image pixel values.</li>
+<li><code>NormalizeBox</code>: Normalize the bounding box.</li>
+<li><code>Permute</code>: Arrange the channels of the image and optionally convert image to BGR format.</li>
+<li><code>MixupImage</code>: Mixup two images with given fraction<sup><a href="#mix">1</a></sup>.</li>
+</ol>
+<p><a name="mix">[1]</a> Please refer to <a href="https://arxiv.org/pdf/1710.09412.pdf">this paper</a>。</p>
+<p><code>transform/arrange_sample.py</code>: Assemble the data samples needed by different models.
+3. Transformer
+<code>transform/post_map.py</code>: Transformations that operates on whole batches, mainly for:
+- Padding whole batch to given stride values
+- Resize images to Multi-scales
+- Randomly adjust the image size of the batch data
+<code>transform/transformer.py</code>: Data filtering batching.
+<code>transform/parallel_map.py</code>: Accelerate data processing with multi-threads/multi-processes.
+4. Reader
+<code>reader.py</code>: Combine source and transforms, return batch data according to <code>max_iter</code>.
+<code>data_feed.py</code>: Configure default parameters for <code>reader.py</code>.</p>
+<h3 id="usage">Usage</h3>
+<h4 id="canned-datasets">Canned Datasets</h4>
+<p>Preset for common datasets, e.g., <code>COCO</code> and <code>Pascal Voc</code> are included. In
+most cases, user can simply use these canned dataset as is. Moreover, the
+whole data pipeline is fully customizable through the yaml configuration files.</p>
+<h4 id="custom-datasets">Custom Datasets</h4>
+<ul>
+<li>Option 1: Convert the dataset to COCO format.</li>
+</ul>
+<pre><code class="sh"> # a small utility (`tools/x2coco.py`) is provided to convert
+ # Labelme-annotated dataset or cityscape dataset to COCO format.
+ python ./ppdet/data/tools/x2coco.py --dataset_type labelme
+                                --json_input_dir ./labelme_annos/
+                                --image_input_dir ./labelme_imgs/
+                                --output_dir ./cocome/
+                                --train_proportion 0.8
+                                --val_proportion 0.2
+                                --test_proportion 0.0
+ # --dataset_type: The data format which is need to be converted. Currently supported are: 'labelme' and 'cityscape'
+ # --json_input_dir：The path of json files which are annotated by Labelme.
+ # --image_input_dir：The path of images.
+ # --output_dir：The path of coverted COCO dataset.
+ # --train_proportion：The train proportion of annatation data.
+ # --val_proportion：The validation proportion of annatation data.
+ # --test_proportion: The inference proportion of annatation data.
+</code></pre>
+
+<ul>
+<li>
+<p>Option 2:</p>
+</li>
+<li>
+<p>Add <code>source/XX_loader.py</code> and implement the <code>load</code> function, following the
+   example of <code>source/coco_loader.py</code> and <code>source/voc_loader.py</code>.</p>
+</li>
+<li>Modify the <code>load</code> function in <code>source/loader.py</code> to make use of the newly
+   added data loader.</li>
+<li>Modify <code>/source/__init__.py</code> accordingly.</li>
+</ul>
+<pre><code class="python">if data_cf['type'] in ['VOCSource', 'COCOSource', 'RoiDbSource']:
+    source_type = 'RoiDbSource'
+# Replace the above code with the following code:
+if data_cf['type'] in ['VOCSource', 'COCOSource', 'RoiDbSource', 'XXSource']:
+    source_type = 'RoiDbSource'
+</code></pre>
+
+<ol>
+<li>In the configure file, define the <code>type</code> of <code>dataset</code> as <code>XXSource</code>.</li>
+</ol>
+<h4 id="how-to-add-data-pre-processing">How to add data pre-processing？</h4>
+<ul>
+<li>To add pre-processing operation for a single image, refer to the classes in
+  <code>transform/operators.py</code>, and implement the desired transformation with a new
+  class.</li>
+<li>To add pre-processing for a batch, one needs to modify the <code>build_post_map</code>
+  function in <code>transform/post_map.py</code>.</li>
+</ul>
+              
+            </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+      
+      
+    </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../mathjax-config.js" defer></script>
+      <script src="../MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+      <script src="../search/main.js" defer></script>
+
+</body>
+</html>

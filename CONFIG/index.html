@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  <link rel="shortcut icon" href="../img/favicon.ico">
+  <title>CONFIG - PaddleDetection Docs</title>
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "CONFIG";
+    var mkdocs_page_input_path = "CONFIG.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> PaddleDetection Docs</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="current">
+	  
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../index.md">Home</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../docs/INSTALL.md">Installation</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../docs/QUICK_STARTED.md">Quick start</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../docs/MODEL_ZOO.md">Modle Zoo</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <span class="caption-text">Deployment</span>
+    <ul class="subnav">
+                <li class="">
+                    
+    <a class="" href="../docs/EXPORT_MODEL.md">Export model</a>
+                </li>
+    </ul>
+	    </li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">PaddleDetection Docs</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>CONFIG</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <p>English | <a href="../CONFIG_cn/">简体中文</a></p>
+<h1 id="config-pipline">Config Pipline</h1>
+<h2 id="introduction">Introduction</h2>
+<p>PaddleDetection takes a rather principled approach to configuration management. We aim to automate the configuration workflow and to reduce configuration errors.</p>
+<h2 id="rationale">Rationale</h2>
+<p>Presently, configuration in mainstream frameworks are usually dictionary based: the global config is simply a giant, loosely defined Python dictionary.</p>
+<p>This approach is error prone, e.g., misspelled or displaced keys may lead to serious errors in training process, causing time loss and wasted resources.</p>
+<p>To avoid the common pitfalls, with automation and static analysis in mind, we propose a configuration design that is user friendly, easy to maintain and extensible.</p>
+<h2 id="design">Design</h2>
+<p>The design utilizes some of Python's reflection mechanism to extract configuration schematics from Python class definitions.</p>
+<p>To be specific, it extracts information from class constructor arguments, including names, docstrings, default values, data types (if type hints are available).</p>
+<p>This approach advocates modular and testable design, leading to a unified and extensible code base.</p>
+<h3 id="api">API</h3>
+<p>Most of the functionality is exposed in <code>ppdet.core.workspace</code> module.</p>
+<ul>
+<li><code>register</code>: This decorator register a class as configurable module; it understands several special annotations in the class definition.<ul>
+<li><code>__category__</code>: For better organization, modules are classified into categories.</li>
+<li><code>__inject__</code>: A list of constructor arguments, which are intended to take module instances as input, module instances will be created at runtime an injected. The corresponding configuration value can be a class name string, a serialized object, a config key pointing to a serialized object, or a dict (in which case the constructor needs to handle it, see example below).</li>
+<li><code>__op__</code>: Shortcut for wrapping PaddlePaddle operators into a callable objects, together with <code>__append_doc__</code> (extracting docstring from target PaddlePaddle operator automatically), this can be a real time saver.</li>
+</ul>
+</li>
+<li><code>serializable</code>: This decorator make a class directly serializable in yaml config file, by taking advantage of <a href="https://pyyaml.org/wiki/PyYAMLDocumentation">pyyaml</a>'s serialization mechanism.</li>
+<li><code>create</code>: Constructs a module instance according to global configuration.</li>
+<li><code>load_config</code> and <code>merge_config</code>: Loading yaml file and merge config settings from command line.</li>
+</ul>
+<h3 id="example">Example</h3>
+<p>Take the <code>RPNHead</code> module for example, it is composed of several PaddlePaddle operators. We first wrap those operators into classes, then pass in instances of these classes when instantiating the <code>RPNHead</code> module.</p>
+<pre><code class="python"># excerpt from `ppdet/modeling/ops.py`
+from ppdet.core.workspace import register, serializable
+
+# ... more operators
+
+@register
+@serializable
+class GenerateProposals(object):
+    # NOTE this class simply wraps a PaddlePaddle operator
+    __op__ = fluid.layers.generate_proposals
+    # NOTE docstring for args are extracted from PaddlePaddle OP
+    __append_doc__ = True
+
+    def __init__(self,
+                 pre_nms_top_n=6000,
+                 post_nms_top_n=1000,
+                 nms_thresh=.5,
+                 min_size=.1,
+                 eta=1.):
+        super(GenerateProposals, self).__init__()
+        self.pre_nms_top_n = pre_nms_top_n
+        self.post_nms_top_n = post_nms_top_n
+        self.nms_thresh = nms_thresh
+        self.min_size = min_size
+        self.eta = eta
+
+# ... more operators
+
+# excerpt from `ppdet/modeling/anchor_heads/rpn_head.py`
+from ppdet.core.workspace import register
+from ppdet.modeling.ops import AnchorGenerator, RPNTargetAssign, GenerateProposals
+
+@register
+class RPNHead(object):
+    &quot;&quot;&quot;
+    RPN Head
+
+    Args:
+        anchor_generator (object): `AnchorGenerator` instance
+        rpn_target_assign (object): `RPNTargetAssign` instance
+        train_proposal (object): `GenerateProposals` instance for training
+        test_proposal (object): `GenerateProposals` instance for testing
+    &quot;&quot;&quot;
+    __inject__ = [
+        'anchor_generator', 'rpn_target_assign', 'train_proposal',
+        'test_proposal'
+    ]
+
+    def __init__(self,
+                 anchor_generator=AnchorGenerator().__dict__,
+                 rpn_target_assign=RPNTargetAssign().__dict__,
+                 train_proposal=GenerateProposals(12000, 2000).__dict__,
+                 test_proposal=GenerateProposals().__dict__):
+        super(RPNHead, self).__init__()
+        self.anchor_generator = anchor_generator
+        self.rpn_target_assign = rpn_target_assign
+        self.train_proposal = train_proposal
+        self.test_proposal = test_proposal
+        if isinstance(anchor_generator, dict):
+            self.anchor_generator = AnchorGenerator(**anchor_generator)
+        if isinstance(rpn_target_assign, dict):
+            self.rpn_target_assign = RPNTargetAssign(**rpn_target_assign)
+        if isinstance(train_proposal, dict):
+            self.train_proposal = GenerateProposals(**train_proposal)
+        if isinstance(test_proposal, dict):
+            self.test_proposal = GenerateProposals(**test_proposal)
+</code></pre>
+
+<p>The corresponding(generated) YAML snippet is as follows, note this is the configuration in <strong>FULL</strong>, all the default values can be omitted. In case of the above example, all arguments have default value, meaning nothing is required in the config file.</p>
+<pre><code class="yaml">RPNHead:
+  test_proposal:
+    eta: 1.0
+    min_size: 0.1
+    nms_thresh: 0.5
+    post_nms_top_n: 1000
+    pre_nms_top_n: 6000
+  train_proposal:
+    eta: 1.0
+    min_size: 0.1
+    nms_thresh: 0.5
+    post_nms_top_n: 2000
+    pre_nms_top_n: 12000
+  anchor_generator:
+    # ...
+  rpn_target_assign:
+    # ...
+</code></pre>
+
+<p>Example snippet that make use of the <code>RPNHead</code> module.</p>
+<pre><code class="python">from ppdet.core.workspace import load_config, merge_config, create
+
+load_config('some_config_file.yml')
+merge_config(more_config_options_from_command_line)
+
+rpn_head = create('RPNHead')
+# ... code that use the created module!
+</code></pre>
+
+<p>Configuration file can also have serialized objects in it, denoted with <code>!</code>, for example</p>
+<pre><code class="yaml">LearningRate:
+  base_lr: 0.01
+  schedulers:
+  - !PiecewiseDecay
+    gamma: 0.1
+    milestones: [60000, 80000]
+  - !LinearWarmup
+    start_factor: 0.3333333333333333
+    steps: 500
+</code></pre>
+
+<p><a href="config_example/">Complete config files</a> of multiple detection architectures are given and brief description of each parameter.</p>
+<h2 id="requirements">Requirements</h2>
+<p>Two Python packages are used, both are optional.</p>
+<ul>
+<li><a href="https://github.com/agronholm/typeguard">typeguard</a> is used for type checking in Python 3.</li>
+<li><a href="https://github.com/rr-/docstring_parser">docstring_parser</a> is needed for docstring parsing.</li>
+</ul>
+<p>To install them, simply run:</p>
+<pre><code class="shell">pip install typeguard http://github.com/willthefrog/docstring_parser/tarball/master
+</code></pre>
+
+<h2 id="tooling">Tooling</h2>
+<p>A small utility (<code>tools/configure.py</code>) is included to simplify the configuration process, it provides 4 commands to walk users through the configuration process:</p>
+<ol>
+<li><code>list</code>: List currently registered modules by category, one can also specify which category to list with the <code>--category</code> flag.</li>
+<li><code>help</code>: Get help information for a module, including description, options, configuration template and example command line flags.</li>
+<li><code>analyze</code>: Check configuration file for missing/extraneous options, options with mismatch type (if type hint is given) and missing dependencies, it also highlights user provided values (overridden default values).</li>
+<li>
+<p><code>generate</code>: Generate a configuration template for a given list of modules. By default it generates a complete configuration file, which can be quite verbose; if a <code>--minimal</code> flag is given, it generates a template that only contain non optional settings. For example, to generate a configuration for Faster R-CNN architecture with <code>ResNet</code> backbone and <code>FPN</code>, run:</p>
+<p><code>shell
+python tools/configure.py generate FasterRCNN ResNet RPNHead RoIAlign BBoxAssigner BBoxHead FasterRCNNTrainFeed FasterRCNNTestFeed LearningRate OptimizerBuilder</code></p>
+<p>For a minimal version, run:</p>
+<p><code>shell
+python tools/configure.py --minimal generate FasterRCNN BBoxHead</code></p>
+</li>
+</ol>
+<h2 id="faq">FAQ</h2>
+<p><strong>Q:</strong> There are some configuration options that are used by multiple modules (e.g., <code>num_classes</code>), how do I avoid duplication in config files?</p>
+<p><strong>A:</strong> We provided a <code>__shared__</code> annotation for exactly this purpose, simply annotate like this <code>__shared__ = ['num_classes']</code>. It works as follows:</p>
+<ol>
+<li>if <code>num_classes</code> is configured for a module in config file, it takes precedence.</li>
+<li>if <code>num_classes</code> is not configured for a module but is present in the config file as a global key, its value will be used.</li>
+<li>otherwise, the default value (<code>81</code>) will be used.</li>
+</ol>
+              
+            </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+      
+      
+    </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../mathjax-config.js" defer></script>
+      <script src="../MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+      <script src="../search/main.js" defer></script>
+
+</body>
+</html>

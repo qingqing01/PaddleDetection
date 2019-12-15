@@ -1,0 +1,1086 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  <link rel="shortcut icon" href="../img/favicon.ico">
+  <title>模型库和基线 - PaddleDetection Docs</title>
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "\u6a21\u578b\u5e93\u548c\u57fa\u7ebf";
+    var mkdocs_page_input_path = "MODEL_ZOO_cn.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> PaddleDetection Docs</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="current">
+	  
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../index.md">Home</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../docs/INSTALL.md">Installation</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../docs/QUICK_STARTED.md">Quick start</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../docs/MODEL_ZOO.md">Modle Zoo</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <span class="caption-text">Deployment</span>
+    <ul class="subnav">
+                <li class="">
+                    
+    <a class="" href="../docs/EXPORT_MODEL.md">Export model</a>
+                </li>
+    </ul>
+	    </li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">PaddleDetection Docs</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>模型库和基线</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="_1">模型库和基线</h1>
+<h2 id="_2">测试环境</h2>
+<ul>
+<li>Python 2.7.1</li>
+<li>PaddlePaddle &gt;=1.5</li>
+<li>CUDA 9.0</li>
+<li>cuDNN &gt;=7.4</li>
+<li>NCCL 2.1.2</li>
+</ul>
+<h2 id="_3">通用设置</h2>
+<ul>
+<li>所有模型均在COCO17数据集中训练和测试。</li>
+<li>除非特殊说明，所有ResNet骨干网络采用<a href="https://arxiv.org/pdf/1812.01187">ResNet-B</a>结构。</li>
+<li>对于RCNN和RetinaNet系列模型，训练阶段仅使用水平翻转作为数据增强，测试阶段不使用数据增强。</li>
+<li><strong>推理时间(fps)</strong>: 推理时间是在一张Tesla V100的GPU上通过'tools/eval.py'测试所有验证集得到，单位是fps(图片数/秒), cuDNN版本是7.5，包括数据加载、网络前向执行和后处理, batch size是1。</li>
+</ul>
+<h2 id="_4">训练策略</h2>
+<ul>
+<li>我们采用和<a href="https://github.com/facebookresearch/Detectron/blob/master/MODEL_ZOO.md#training-schedules">Detectron</a>相同的训练策略。</li>
+<li>1x 策略表示：在总batch size为16时，初始学习率为0.02，在6万轮和8万轮后学习率分别下降10倍，最终训练9万轮。在总batch size为8时，初始学习率为0.01，在12万轮和16万轮后学习率分别下降10倍，最终训练18万轮。</li>
+<li>2x 策略为1x策略的两倍，同时学习率调整位置也为1x的两倍。</li>
+</ul>
+<h2 id="imagenet">ImageNet预训练模型</h2>
+<p>Paddle提供基于ImageNet的骨架网络预训练模型。所有预训练模型均通过标准的Imagenet-1k数据集训练得到。<a href="https://github.com/PaddlePaddle/models/tree/develop/PaddleCV/image_classification#supported-models-and-performances">下载链接</a></p>
+<ul>
+<li>注：ResNet50模型通过余弦学习率调整策略训练得到。<a href="https://paddle-imagenet-models-name.bj.bcebos.com/ResNet50_cos_pretrained.tar">下载链接</a></li>
+</ul>
+<h2 id="_5">基线</h2>
+<h3 id="faster-mask-r-cnn">Faster &amp; Mask R-CNN</h3>
+<table>
+<thead>
+<tr>
+<th align="left">骨架网络</th>
+<th align="left">网络类型</th>
+<th align="center">每张GPU图片个数</th>
+<th align="center">学习率策略</th>
+<th align="center">推理时间(fps)</th>
+<th align="center">Box AP</th>
+<th align="center">Mask AP</th>
+<th align="center">下载</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">ResNet50</td>
+<td align="left">Faster</td>
+<td align="center">1</td>
+<td align="center">1x</td>
+<td align="center">12.747</td>
+<td align="center">35.2</td>
+<td align="center">-</td>
+<td align="center"><a href="https://paddlemodels.bj.bcebos.com/object_detection/faster_rcnn_r50_1x.tar">下载链接</a></td>
+</tr>
+<tr>
+<td align="left">ResNet50</td>
+<td align="left">Faster</td>
+<td align="center">1</td>
+<td align="center">2x</td>
+<td align="center">12.686</td>
+<td align="center">37.1</td>
+<td align="center">-</td>
+<td align="center"><a href="https://paddlemodels.bj.bcebos.com/object_detection/faster_rcnn_r50_2x.tar">下载链接</a></td>
+</tr>
+<tr>
+<td align="left">ResNet50</td>
+<td align="left">Mask</td>
+<td align="center">1</td>
+<td align="center">1x</td>
+<td align="center">11.615</td>
+<td align="center">36.5</td>
+<td align="center">32.2</td>
+<td align="center"><a href="https://paddlemodels.bj.bcebos.com/object_detection/mask_rcnn_r50_1x.tar">下载链接</a></td>
+</tr>
+<tr>
+<td align="left">ResNet50</td>
+<td align="left">Mask</td>
+<td align="center">1</td>
+<td align="center">2x</td>
+<td align="center">11.494</td>
+<td align="center">38.2</td>
+<td align="center">33.4</td>
+<td align="center"><a href="https://paddlemodels.bj.bcebos.com/object_detection/mask_rcnn_r50_2x.tar">下载链接</a></td>
+</tr>
+<tr>
+<td align="left">ResNet50-vd</td>
+<td align="left">Faster</td>
+<td align="center">1</td>
+<td align="center">1x</td>
+<td align="center">12.575</td>
+<td align="center">36.4</td>
+<td align="center">-</td>
+<td align="center"><a href="https://paddlemodels.bj.bcebos.com/object_detection/faster_rcnn_r50_vd_1x.tar">下载链接</a></td>
+</tr>
+<tr>
+<td align="left">ResNet50-FPN</td>
+<td align="left">Faster</td>
+<td align="center">2</td>
+<td align="center">1x</td>
+<td align="center">22.273</td>
+<td align="center">37.2</td>
+<td align="center">-</td>
+<td align="center"><a href="https://paddlemodels.bj.bcebos.com/object_detection/faster_rcnn_r50_fpn_1x.tar">下载链接</a></td>
+</tr>
+<tr>
+<td align="left">ResNet50-FPN</td>
+<td align="left">Faster</td>
+<td align="center">2</td>
+<td align="center">2x</td>
+<td align="center">22.297</td>
+<td align="center">37.7</td>
+<td align="center">-</td>
+<td align="center"><a href="https://paddlemodels.bj.bcebos.com/object_detection/faster_rcnn_r50_fpn_2x.tar">下载链接</a></td>
+</tr>
+<tr>
+<td align="left">ResNet50-FPN</td>
+<td align="left">Mask</td>
+<td align="center">1</td>
+<td align="center">1x</td>
+<td align="center">15.184</td>
+<td align="center">37.9</td>
+<td align="center">34.2</td>
+<td align="center"><a href="https://paddlemodels.bj.bcebos.com/object_detection/mask_rcnn_r50_fpn_1x.tar">下载链接</a></td>
+</tr>
+<tr>
+<td align="left">ResNet50-FPN</td>
+<td align="left">Mask</td>
+<td align="center">1</td>
+<td align="center">2x</td>
+<td align="center">15.881</td>
+<td align="center">38.7</td>
+<td align="center">34.7</td>
+<td align="center"><a href="https://paddlemodels.bj.bcebos.com/object_detection/mask_rcnn_r50_fpn_2x.tar">下载链接</a></td>
+</tr>
+<tr>
+<td align="left">ResNet50-FPN</td>
+<td align="left">Cascade Faster</td>
+<td align="center">2</td>
+<td align="center">1x</td>
+<td align="center">17.507</td>
+<td align="center">40.9</td>
+<td align="center">-</td>
+<td align="center"><a href="https://paddlemodels.bj.bcebos.com/object_detection/cascade_rcnn_r50_fpn_1x.tar">下载链接</a></td>
+</tr>
+<tr>
+<td align="left">ResNet50-FPN</td>
+<td align="left">Cascade Mask</td>
+<td align="center">1</td>
+<td align="center">1x</td>
+<td align="center">-</td>
+<td align="center">41.3</td>
+<td align="center">35.5</td>
+<td align="center"><a href="https://paddlemodels.bj.bcebos.com/object_detection/cascade_mask_rcnn_r50_fpn_1x.tar">下载链接</a></td>
+</tr>
+<tr>
+<td align="left">ResNet50-vd-FPN</td>
+<td align="left">Faster</td>
+<td align="center">2</td>
+<td align="center">2x</td>
+<td align="center">21.847</td>
+<td align="center">38.9</td>
+<td align="center">-</td>
+<td align="center"><a href="https://paddlemodels.bj.bcebos.com/object_detection/faster_rcnn_r50_vd_fpn_2x.tar">下载链接</a></td>
+</tr>
+<tr>
+<td align="left">ResNet50-vd-FPN</td>
+<td align="left">Mask</td>
+<td align="center">1</td>
+<td align="center">2x</td>
+<td align="center">15.825</td>
+<td align="center">39.8</td>
+<td align="center">35.4</td>
+<td align="center"><a href="https://paddlemodels.bj.bcebos.com/object_detection/mask_rcnn_r50_vd_fpn_2x.tar">下载链接</a></td>
+</tr>
+<tr>
+<td align="left">CBResNet50-vd-FPN</td>
+<td align="left">Faster</td>
+<td align="center">2</td>
+<td align="center">1x</td>
+<td align="center">-</td>
+<td align="center">39.7</td>
+<td align="center">-</td>
+<td align="center"><a href="https://paddlemodels.bj.bcebos.com/object_detection/faster_rcnn_cbr50_vd_dual_fpn_1x.tar">下载链接</a></td>
+</tr>
+<tr>
+<td align="left">ResNet101</td>
+<td align="left">Faster</td>
+<td align="center">1</td>
+<td align="center">1x</td>
+<td align="center">9.316</td>
+<td align="center">38.3</td>
+<td align="center">-</td>
+<td align="center"><a href="https://paddlemodels.bj.bcebos.com/object_detection/faster_rcnn_r101_1x.tar">下载链接</a></td>
+</tr>
+<tr>
+<td align="left">ResNet101-FPN</td>
+<td align="left">Faster</td>
+<td align="center">1</td>
+<td align="center">1x</td>
+<td align="center">17.297</td>
+<td align="center">38.7</td>
+<td align="center">-</td>
+<td align="center"><a href="https://paddlemodels.bj.bcebos.com/object_detection/faster_rcnn_r101_fpn_1x.tar">下载链接</a></td>
+</tr>
+<tr>
+<td align="left">ResNet101-FPN</td>
+<td align="left">Faster</td>
+<td align="center">1</td>
+<td align="center">2x</td>
+<td align="center">17.246</td>
+<td align="center">39.1</td>
+<td align="center">-</td>
+<td align="center"><a href="https://paddlemodels.bj.bcebos.com/object_detection/faster_rcnn_r101_fpn_2x.tar">下载链接</a></td>
+</tr>
+<tr>
+<td align="left">ResNet101-FPN</td>
+<td align="left">Mask</td>
+<td align="center">1</td>
+<td align="center">1x</td>
+<td align="center">12.983</td>
+<td align="center">39.5</td>
+<td align="center">35.2</td>
+<td align="center"><a href="https://paddlemodels.bj.bcebos.com/object_detection/mask_rcnn_r101_fpn_1x.tar">下载链接</a></td>
+</tr>
+<tr>
+<td align="left">ResNet101-vd-FPN</td>
+<td align="left">Faster</td>
+<td align="center">1</td>
+<td align="center">1x</td>
+<td align="center">17.011</td>
+<td align="center">40.5</td>
+<td align="center">-</td>
+<td align="center"><a href="https://paddlemodels.bj.bcebos.com/object_detection/faster_rcnn_r101_vd_fpn_1x.tar">下载链接</a></td>
+</tr>
+<tr>
+<td align="left">ResNet101-vd-FPN</td>
+<td align="left">Faster</td>
+<td align="center">1</td>
+<td align="center">2x</td>
+<td align="center">16.934</td>
+<td align="center">40.8</td>
+<td align="center">-</td>
+<td align="center"><a href="https://paddlemodels.bj.bcebos.com/object_detection/faster_rcnn_r101_vd_fpn_2x.tar">下载链接</a></td>
+</tr>
+<tr>
+<td align="left">ResNet101-vd-FPN</td>
+<td align="left">Mask</td>
+<td align="center">1</td>
+<td align="center">1x</td>
+<td align="center">13.105</td>
+<td align="center">41.4</td>
+<td align="center">36.8</td>
+<td align="center"><a href="https://paddlemodels.bj.bcebos.com/object_detection/mask_rcnn_r101_vd_fpn_1x.tar">下载链接</a></td>
+</tr>
+<tr>
+<td align="left">ResNeXt101-vd-FPN</td>
+<td align="left">Faster</td>
+<td align="center">1</td>
+<td align="center">1x</td>
+<td align="center">8.815</td>
+<td align="center">42.2</td>
+<td align="center">-</td>
+<td align="center"><a href="https://paddlemodels.bj.bcebos.com/object_detection/faster_rcnn_x101_vd_64x4d_fpn_1x.tar">下载链接</a></td>
+</tr>
+<tr>
+<td align="left">ResNeXt101-vd-FPN</td>
+<td align="left">Faster</td>
+<td align="center">1</td>
+<td align="center">2x</td>
+<td align="center">8.809</td>
+<td align="center">41.7</td>
+<td align="center">-</td>
+<td align="center"><a href="https://paddlemodels.bj.bcebos.com/object_detection/faster_rcnn_x101_vd_64x4d_fpn_2x.tar">下载链接</a></td>
+</tr>
+<tr>
+<td align="left">ResNeXt101-vd-FPN</td>
+<td align="left">Mask</td>
+<td align="center">1</td>
+<td align="center">1x</td>
+<td align="center">7.689</td>
+<td align="center">42.9</td>
+<td align="center">37.9</td>
+<td align="center"><a href="https://paddlemodels.bj.bcebos.com/object_detection/mask_rcnn_x101_vd_64x4d_fpn_1x.tar">下载链接</a></td>
+</tr>
+<tr>
+<td align="left">ResNeXt101-vd-FPN</td>
+<td align="left">Mask</td>
+<td align="center">1</td>
+<td align="center">2x</td>
+<td align="center">7.859</td>
+<td align="center">42.6</td>
+<td align="center">37.6</td>
+<td align="center"><a href="https://paddlemodels.bj.bcebos.com/object_detection/mask_rcnn_x101_vd_64x4d_fpn_2x.tar">下载链接</a></td>
+</tr>
+<tr>
+<td align="left">SENet154-vd-FPN</td>
+<td align="left">Faster</td>
+<td align="center">1</td>
+<td align="center">1.44x</td>
+<td align="center">3.408</td>
+<td align="center">42.9</td>
+<td align="center">-</td>
+<td align="center"><a href="https://paddlemodels.bj.bcebos.com/object_detection/faster_rcnn_se154_vd_fpn_s1x.tar">下载链接</a></td>
+</tr>
+<tr>
+<td align="left">SENet154-vd-FPN</td>
+<td align="left">Mask</td>
+<td align="center">1</td>
+<td align="center">1.44x</td>
+<td align="center">3.233</td>
+<td align="center">44.0</td>
+<td align="center">38.7</td>
+<td align="center"><a href="https://paddlemodels.bj.bcebos.com/object_detection/mask_rcnn_se154_vd_fpn_s1x.tar">下载链接</a></td>
+</tr>
+<tr>
+<td align="left">ResNet101-vd-FPN</td>
+<td align="left">CascadeClsAware Faster</td>
+<td align="center">2</td>
+<td align="center">1x</td>
+<td align="center">-</td>
+<td align="center">44.7(softnms)</td>
+<td align="center">-</td>
+<td align="center"><a href="https://paddlemodels.bj.bcebos.com/object_detection/cascade_rcnn_cls_aware_r101_vd_fpn_1x_softnms.tar">下载链接</a></td>
+</tr>
+</tbody>
+</table>
+<h3 id="deformable-v2">Deformable 卷积网络v2</h3>
+<table>
+<thead>
+<tr>
+<th align="left">骨架网络</th>
+<th align="left">网络类型</th>
+<th align="center">卷积</th>
+<th align="center">每张GPU图片个数</th>
+<th align="center">学习率策略</th>
+<th align="center">推理时间(fps)</th>
+<th align="center">Box AP</th>
+<th align="center">Mask AP</th>
+<th align="center">下载</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">ResNet50-FPN</td>
+<td align="left">Faster</td>
+<td align="center">c3-c5</td>
+<td align="center">2</td>
+<td align="center">1x</td>
+<td align="center">19.978</td>
+<td align="center">41.0</td>
+<td align="center">-</td>
+<td align="center"><a href="https://paddlemodels.bj.bcebos.com/object_detection/faster_rcnn_dcn_r50_fpn_1x.tar">下载链接</a></td>
+</tr>
+<tr>
+<td align="left">ResNet50-vd-FPN</td>
+<td align="left">Faster</td>
+<td align="center">c3-c5</td>
+<td align="center">2</td>
+<td align="center">2x</td>
+<td align="center">19.222</td>
+<td align="center">42.4</td>
+<td align="center">-</td>
+<td align="center"><a href="https://paddlemodels.bj.bcebos.com/object_detection/faster_rcnn_dcn_r50_vd_fpn_2x.tar">下载链接</a></td>
+</tr>
+<tr>
+<td align="left">ResNet101-vd-FPN</td>
+<td align="left">Faster</td>
+<td align="center">c3-c5</td>
+<td align="center">2</td>
+<td align="center">1x</td>
+<td align="center">14.477</td>
+<td align="center">44.1</td>
+<td align="center">-</td>
+<td align="center"><a href="https://paddlemodels.bj.bcebos.com/object_detection/faster_rcnn_dcn_r101_vd_fpn_1x.tar">下载链接</a></td>
+</tr>
+<tr>
+<td align="left">ResNeXt101-vd-FPN</td>
+<td align="left">Faster</td>
+<td align="center">c3-c5</td>
+<td align="center">1</td>
+<td align="center">1x</td>
+<td align="center">7.209</td>
+<td align="center">45.2</td>
+<td align="center">-</td>
+<td align="center"><a href="https://paddlemodels.bj.bcebos.com/object_detection/faster_rcnn_dcn_x101_vd_64x4d_fpn_1x.tar">下载链接</a></td>
+</tr>
+<tr>
+<td align="left">ResNet50-FPN</td>
+<td align="left">Mask</td>
+<td align="center">c3-c5</td>
+<td align="center">1</td>
+<td align="center">1x</td>
+<td align="center">14.53</td>
+<td align="center">41.9</td>
+<td align="center">37.3</td>
+<td align="center"><a href="https://paddlemodels.bj.bcebos.com/object_detection/mask_rcnn_dcn_r50_fpn_1x.tar">下载链接</a></td>
+</tr>
+<tr>
+<td align="left">ResNet50-vd-FPN</td>
+<td align="left">Mask</td>
+<td align="center">c3-c5</td>
+<td align="center">1</td>
+<td align="center">2x</td>
+<td align="center">14.832</td>
+<td align="center">42.9</td>
+<td align="center">38.0</td>
+<td align="center"><a href="https://paddlemodels.bj.bcebos.com/object_detection/mask_rcnn_dcn_r50_vd_fpn_2x.tar">下载链接</a></td>
+</tr>
+<tr>
+<td align="left">ResNet101-vd-FPN</td>
+<td align="left">Mask</td>
+<td align="center">c3-c5</td>
+<td align="center">1</td>
+<td align="center">1x</td>
+<td align="center">11.546</td>
+<td align="center">44.6</td>
+<td align="center">39.2</td>
+<td align="center"><a href="https://paddlemodels.bj.bcebos.com/object_detection/mask_rcnn_dcn_r101_vd_fpn_1x.tar">下载链接</a></td>
+</tr>
+<tr>
+<td align="left">ResNeXt101-vd-FPN</td>
+<td align="left">Mask</td>
+<td align="center">c3-c5</td>
+<td align="center">1</td>
+<td align="center">1x</td>
+<td align="center">6.45</td>
+<td align="center">46.2</td>
+<td align="center">40.4</td>
+<td align="center"><a href="https://paddlemodels.bj.bcebos.com/object_detection/mask_rcnn_dcn_x101_vd_64x4d_fpn_1x.tar">下载链接</a></td>
+</tr>
+<tr>
+<td align="left">ResNet50-FPN</td>
+<td align="left">Cascade Faster</td>
+<td align="center">c3-c5</td>
+<td align="center">2</td>
+<td align="center">1x</td>
+<td align="center">-</td>
+<td align="center">44.2</td>
+<td align="center">-</td>
+<td align="center"><a href="https://paddlemodels.bj.bcebos.com/object_detection/cascade_rcnn_dcn_r50_fpn_1x.tar">下载链接</a></td>
+</tr>
+<tr>
+<td align="left">ResNet101-vd-FPN</td>
+<td align="left">Cascade Faster</td>
+<td align="center">c3-c5</td>
+<td align="center">2</td>
+<td align="center">1x</td>
+<td align="center">-</td>
+<td align="center">46.4</td>
+<td align="center">-</td>
+<td align="center"><a href="https://paddlemodels.bj.bcebos.com/object_detection/cascade_rcnn_dcn_r101_vd_fpn_1x.tar">下载链接</a></td>
+</tr>
+<tr>
+<td align="left">ResNeXt101-vd-FPN</td>
+<td align="left">Cascade Faster</td>
+<td align="center">c3-c5</td>
+<td align="center">2</td>
+<td align="center">1x</td>
+<td align="center">-</td>
+<td align="center">47.3</td>
+<td align="center">-</td>
+<td align="center"><a href="https://paddlemodels.bj.bcebos.com/object_detection/cascade_rcnn_dcn_x101_vd_64x4d_fpn_1x.tar">下载链接</a></td>
+</tr>
+<tr>
+<td align="left">SENet154-vd-FPN</td>
+<td align="left">Cascade Mask</td>
+<td align="center">c3-c5</td>
+<td align="center">1</td>
+<td align="center">1.44x</td>
+<td align="center">-</td>
+<td align="center">51.9</td>
+<td align="center">43.9</td>
+<td align="center"><a href="https://paddlemodels.bj.bcebos.com/object_detection/cascade_mask_rcnn_dcnv2_se154_vd_fpn_gn_s1x.tar">下载链接</a></td>
+</tr>
+<tr>
+<td align="left">ResNet200-vd-FPN-Nonlocal</td>
+<td align="left">CascadeClsAware Faster</td>
+<td align="center">c3-c5</td>
+<td align="center">1</td>
+<td align="center">2.5x</td>
+<td align="center">-</td>
+<td align="center">51.7%(softnms)</td>
+<td align="center">-</td>
+<td align="center"><a href="https://paddlemodels.bj.bcebos.com/object_detection/cascade_rcnn_cls_aware_r200_vd_fpn_dcnv2_nonlocal_softnms.tar">下载链接</a></td>
+</tr>
+<tr>
+<td align="left">CBResNet200-vd-FPN-Nonlocal</td>
+<td align="left">Cascade Faster</td>
+<td align="center">c3-c5</td>
+<td align="center">1</td>
+<td align="center">2.5x</td>
+<td align="center">-</td>
+<td align="center">53.3%(softnms)</td>
+<td align="center">-</td>
+<td align="center"><a href="https://paddlemodels.bj.bcebos.com/object_detection/cascade_rcnn_cbr200_vd_fpn_dcnv2_nonlocal_softnms.tar">下载链接</a></td>
+</tr>
+</tbody>
+</table>
+<h4 id="_6">注意事项:</h4>
+<ul>
+<li>Deformable卷积网络v2(dcn_v2)参考自论文<a href="https://arxiv.org/abs/1811.11168">Deformable ConvNets v2</a>.</li>
+<li><code>c3-c5</code>意思是在resnet模块的3到5阶段增加<code>dcn</code>.</li>
+<li>详细的配置文件在<a href="https://github.com/PaddlePaddle/PaddleDetection/tree/master/configs/dcn">configs/dcn</a></li>
+</ul>
+<h3 id="group-normalization">Group Normalization</h3>
+<table>
+<thead>
+<tr>
+<th align="left">骨架网络</th>
+<th align="left">网络类型</th>
+<th align="center">每张GPU图片个数</th>
+<th align="center">学习率策略</th>
+<th align="center">Box AP</th>
+<th align="center">Mask AP</th>
+<th align="center">下载</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">ResNet50-FPN</td>
+<td align="left">Faster</td>
+<td align="center">2</td>
+<td align="center">2x</td>
+<td align="center">39.7</td>
+<td align="center">-</td>
+<td align="center"><a href="https://paddlemodels.bj.bcebos.com/object_detection/faster_rcnn_r50_fpn_gn_2x.tar">下载链接</a></td>
+</tr>
+<tr>
+<td align="left">ResNet50-FPN</td>
+<td align="left">Mask</td>
+<td align="center">1</td>
+<td align="center">2x</td>
+<td align="center">40.1</td>
+<td align="center">35.8</td>
+<td align="center"><a href="https://paddlemodels.bj.bcebos.com/object_detection/mask_rcnn_r50_fpn_gn_2x.tar">下载链接</a></td>
+</tr>
+</tbody>
+</table>
+<h4 id="_7">注意事项:</h4>
+<ul>
+<li>Group Normalization参考论文<a href="https://arxiv.org/abs/1803.08494">Group Normalization</a>.</li>
+<li>详细的配置文件在<a href="https://github.com/PaddlePaddle/PaddleDetection/tree/master/configs/gn">configs/gn</a></li>
+</ul>
+<h3 id="yolo-v3">YOLO v3</h3>
+<table>
+<thead>
+<tr>
+<th align="left">骨架网络</th>
+<th align="center">预训练数据集</th>
+<th align="center">输入尺寸</th>
+<th align="center">加入deformable卷积</th>
+<th align="center">每张GPU图片个数</th>
+<th align="center">学习率策略</th>
+<th align="center">推理时间(fps)</th>
+<th align="center">Box AP</th>
+<th align="center">下载</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">DarkNet53 (paper)</td>
+<td align="center">ImageNet</td>
+<td align="center">608</td>
+<td align="center">否</td>
+<td align="center">8</td>
+<td align="center">270e</td>
+<td align="center">-</td>
+<td align="center">33.0</td>
+<td align="center">-</td>
+</tr>
+<tr>
+<td align="left">DarkNet53 (paper)</td>
+<td align="center">ImageNet</td>
+<td align="center">416</td>
+<td align="center">否</td>
+<td align="center">8</td>
+<td align="center">270e</td>
+<td align="center">-</td>
+<td align="center">31.0</td>
+<td align="center">-</td>
+</tr>
+<tr>
+<td align="left">DarkNet53 (paper)</td>
+<td align="center">ImageNet</td>
+<td align="center">320</td>
+<td align="center">否</td>
+<td align="center">8</td>
+<td align="center">270e</td>
+<td align="center">-</td>
+<td align="center">28.2</td>
+<td align="center">-</td>
+</tr>
+<tr>
+<td align="left">DarkNet53</td>
+<td align="center">ImageNet</td>
+<td align="center">608</td>
+<td align="center">否</td>
+<td align="center">8</td>
+<td align="center">270e</td>
+<td align="center">45.571</td>
+<td align="center">38.9</td>
+<td align="center"><a href="https://paddlemodels.bj.bcebos.com/object_detection/yolov3_darknet.tar">下载链接</a></td>
+</tr>
+<tr>
+<td align="left">DarkNet53</td>
+<td align="center">ImageNet</td>
+<td align="center">416</td>
+<td align="center">否</td>
+<td align="center">8</td>
+<td align="center">270e</td>
+<td align="center">-</td>
+<td align="center">37.5</td>
+<td align="center"><a href="https://paddlemodels.bj.bcebos.com/object_detection/yolov3_darknet.tar">下载链接</a></td>
+</tr>
+<tr>
+<td align="left">DarkNet53</td>
+<td align="center">ImageNet</td>
+<td align="center">320</td>
+<td align="center">否</td>
+<td align="center">8</td>
+<td align="center">270e</td>
+<td align="center">-</td>
+<td align="center">34.8</td>
+<td align="center"><a href="https://paddlemodels.bj.bcebos.com/object_detection/yolov3_darknet.tar">下载链接</a></td>
+</tr>
+<tr>
+<td align="left">MobileNet-V1</td>
+<td align="center">ImageNet</td>
+<td align="center">608</td>
+<td align="center">否</td>
+<td align="center">8</td>
+<td align="center">270e</td>
+<td align="center">78.302</td>
+<td align="center">29.3</td>
+<td align="center"><a href="https://paddlemodels.bj.bcebos.com/object_detection/yolov3_mobilenet_v1.tar">下载链接</a></td>
+</tr>
+<tr>
+<td align="left">MobileNet-V1</td>
+<td align="center">ImageNet</td>
+<td align="center">416</td>
+<td align="center">否</td>
+<td align="center">8</td>
+<td align="center">270e</td>
+<td align="center">-</td>
+<td align="center">29.3</td>
+<td align="center"><a href="https://paddlemodels.bj.bcebos.com/object_detection/yolov3_mobilenet_v1.tar">下载链接</a></td>
+</tr>
+<tr>
+<td align="left">MobileNet-V1</td>
+<td align="center">ImageNet</td>
+<td align="center">320</td>
+<td align="center">否</td>
+<td align="center">8</td>
+<td align="center">270e</td>
+<td align="center">-</td>
+<td align="center">27.1</td>
+<td align="center"><a href="https://paddlemodels.bj.bcebos.com/object_detection/yolov3_mobilenet_v1.tar">下载链接</a></td>
+</tr>
+<tr>
+<td align="left">ResNet34</td>
+<td align="center">ImageNet</td>
+<td align="center">608</td>
+<td align="center">否</td>
+<td align="center">8</td>
+<td align="center">270e</td>
+<td align="center">63.356</td>
+<td align="center">36.2</td>
+<td align="center"><a href="https://paddlemodels.bj.bcebos.com/object_detection/yolov3_r34.tar">下载链接</a></td>
+</tr>
+<tr>
+<td align="left">ResNet34</td>
+<td align="center">ImageNet</td>
+<td align="center">416</td>
+<td align="center">否</td>
+<td align="center">8</td>
+<td align="center">270e</td>
+<td align="center">-</td>
+<td align="center">34.3</td>
+<td align="center"><a href="https://paddlemodels.bj.bcebos.com/object_detection/yolov3_r34.tar">下载链接</a></td>
+</tr>
+<tr>
+<td align="left">ResNet34</td>
+<td align="center">ImageNet</td>
+<td align="center">320</td>
+<td align="center">否</td>
+<td align="center">8</td>
+<td align="center">270e</td>
+<td align="center">-</td>
+<td align="center">31.4</td>
+<td align="center"><a href="https://paddlemodels.bj.bcebos.com/object_detection/yolov3_r34.tar">下载链接</a></td>
+</tr>
+<tr>
+<td align="left">ResNet50_vd</td>
+<td align="center">ImageNet</td>
+<td align="center">608</td>
+<td align="center">是</td>
+<td align="center">8</td>
+<td align="center">270e</td>
+<td align="center">-</td>
+<td align="center">39.1</td>
+<td align="center"><a href="https://paddlemodels.bj.bcebos.com/object_detection/yolov3_r50vd_dcn.tar">下载链接</a></td>
+</tr>
+<tr>
+<td align="left">ResNet50_vd</td>
+<td align="center">Object365</td>
+<td align="center">608</td>
+<td align="center">是</td>
+<td align="center">8</td>
+<td align="center">270e</td>
+<td align="center">-</td>
+<td align="center">41.4</td>
+<td align="center"><a href="https://paddlemodels.bj.bcebos.com/object_detection/yolov3_r50vd_dcn_obj365_pretrained_coco.tar">下载链接</a></td>
+</tr>
+</tbody>
+</table>
+<h3 id="yolo-v3-pasacl-voc">YOLO v3 基于Pasacl VOC数据集</h3>
+<table>
+<thead>
+<tr>
+<th align="left">骨架网络</th>
+<th align="center">输入尺寸</th>
+<th align="center">每张GPU图片个数</th>
+<th align="center">学习率策略</th>
+<th align="center">推理时间(fps)</th>
+<th align="center">Box AP</th>
+<th align="center">下载</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">DarkNet53</td>
+<td align="center">608</td>
+<td align="center">8</td>
+<td align="center">270e</td>
+<td align="center">54.977</td>
+<td align="center">83.5</td>
+<td align="center"><a href="https://paddlemodels.bj.bcebos.com/object_detection/yolov3_darknet_voc.tar">下载链接</a></td>
+</tr>
+<tr>
+<td align="left">DarkNet53</td>
+<td align="center">416</td>
+<td align="center">8</td>
+<td align="center">270e</td>
+<td align="center">-</td>
+<td align="center">83.6</td>
+<td align="center"><a href="https://paddlemodels.bj.bcebos.com/object_detection/yolov3_darknet_voc.tar">下载链接</a></td>
+</tr>
+<tr>
+<td align="left">DarkNet53</td>
+<td align="center">320</td>
+<td align="center">8</td>
+<td align="center">270e</td>
+<td align="center">-</td>
+<td align="center">82.2</td>
+<td align="center"><a href="https://paddlemodels.bj.bcebos.com/object_detection/yolov3_darknet_voc.tar">下载链接</a></td>
+</tr>
+<tr>
+<td align="left">MobileNet-V1</td>
+<td align="center">608</td>
+<td align="center">8</td>
+<td align="center">270e</td>
+<td align="center">104.291</td>
+<td align="center">76.2</td>
+<td align="center"><a href="https://paddlemodels.bj.bcebos.com/object_detection/yolov3_mobilenet_v1_voc.tar">下载链接</a></td>
+</tr>
+<tr>
+<td align="left">MobileNet-V1</td>
+<td align="center">416</td>
+<td align="center">8</td>
+<td align="center">270e</td>
+<td align="center">-</td>
+<td align="center">76.7</td>
+<td align="center"><a href="https://paddlemodels.bj.bcebos.com/object_detection/yolov3_mobilenet_v1_voc.tar">下载链接</a></td>
+</tr>
+<tr>
+<td align="left">MobileNet-V1</td>
+<td align="center">320</td>
+<td align="center">8</td>
+<td align="center">270e</td>
+<td align="center">-</td>
+<td align="center">75.3</td>
+<td align="center"><a href="https://paddlemodels.bj.bcebos.com/object_detection/yolov3_mobilenet_v1_voc.tar">下载链接</a></td>
+</tr>
+<tr>
+<td align="left">ResNet34</td>
+<td align="center">608</td>
+<td align="center">8</td>
+<td align="center">270e</td>
+<td align="center">82.247</td>
+<td align="center">82.6</td>
+<td align="center"><a href="https://paddlemodels.bj.bcebos.com/object_detection/yolov3_r34_voc.tar">下载链接</a></td>
+</tr>
+<tr>
+<td align="left">ResNet34</td>
+<td align="center">416</td>
+<td align="center">8</td>
+<td align="center">270e</td>
+<td align="center">-</td>
+<td align="center">81.9</td>
+<td align="center"><a href="https://paddlemodels.bj.bcebos.com/object_detection/yolov3_r34_voc.tar">下载链接</a></td>
+</tr>
+<tr>
+<td align="left">ResNet34</td>
+<td align="center">320</td>
+<td align="center">8</td>
+<td align="center">270e</td>
+<td align="center">-</td>
+<td align="center">80.1</td>
+<td align="center"><a href="https://paddlemodels.bj.bcebos.com/object_detection/yolov3_r34_voc.tar">下载链接</a></td>
+</tr>
+</tbody>
+</table>
+<h4 id="_8">注意事项:</h4>
+<ul>
+<li>上表中也提供了原论文<a href="https://arxiv.org/abs/1804.02767">YOLOv3</a>中YOLOv3-DarkNet53的精度，我们的实现版本主要从在bounding box的宽度和高度回归上使用了L1损失，图像mixup和label smooth等方法优化了其精度。</li>
+<li>YOLO v3在8卡，总batch size为64下训练270轮。数据增强包括：mixup, 随机颜色失真，随机剪裁，随机扩张，随机插值法，随机翻转。YOLO v3在训练阶段对minibatch采用随机reshape，可以采用相同的模型测试不同尺寸图片，我们分别提供了尺寸为608/416/320大小的测试结果。deformable卷积作用在骨架网络5阶段。</li>
+</ul>
+<h3 id="retinanet">RetinaNet</h3>
+<table>
+<thead>
+<tr>
+<th align="center">骨架网络</th>
+<th align="center">每张GPU图片个数</th>
+<th align="center">学习率策略</th>
+<th align="center">Box AP</th>
+<th align="center">下载</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">ResNet50-FPN</td>
+<td align="center">2</td>
+<td align="center">1x</td>
+<td align="center">36.0</td>
+<td align="center"><a href="https://paddlemodels.bj.bcebos.com/object_detection/retinanet_r50_fpn_1x.tar">下载链接</a></td>
+</tr>
+<tr>
+<td align="center">ResNet101-FPN</td>
+<td align="center">2</td>
+<td align="center">1x</td>
+<td align="center">37.3</td>
+<td align="center"><a href="https://paddlemodels.bj.bcebos.com/object_detection/retinanet_r101_fpn_1x.tar">下载链接</a></td>
+</tr>
+<tr>
+<td align="center">ResNeXt101-vd-FPN</td>
+<td align="center">1</td>
+<td align="center">1x</td>
+<td align="center">40.5</td>
+<td align="center"><a href="https://paddlemodels.bj.bcebos.com/object_detection/retinanet_x101_vd_64x4d_fpn_1x.tar">下载链接</a></td>
+</tr>
+</tbody>
+</table>
+<p><strong>注意事项:</strong> RetinaNet系列模型中，在总batch size为16下情况下，初始学习率改为0.01。</p>
+<h3 id="ssd">SSD</h3>
+<table>
+<thead>
+<tr>
+<th align="center">骨架网络</th>
+<th align="center">输入尺寸</th>
+<th align="center">每张GPU图片个数</th>
+<th align="center">学习率策略</th>
+<th align="center">推理时间(fps)</th>
+<th align="center">Box AP</th>
+<th align="center">下载</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">VGG16</td>
+<td align="center">300</td>
+<td align="center">8</td>
+<td align="center">40万</td>
+<td align="center">81.613</td>
+<td align="center">25.1</td>
+<td align="center"><a href="https://paddlemodels.bj.bcebos.com/object_detection/ssd_vgg16_300.tar">下载链接</a></td>
+</tr>
+<tr>
+<td align="center">VGG16</td>
+<td align="center">512</td>
+<td align="center">8</td>
+<td align="center">40万</td>
+<td align="center">46.007</td>
+<td align="center">29.1</td>
+<td align="center"><a href="https://paddlemodels.bj.bcebos.com/object_detection/ssd_vgg16_512.tar">下载链接</a></td>
+</tr>
+</tbody>
+</table>
+<p><strong>注意事项:</strong> VGG-SSD在总batch size为32下训练40万轮。</p>
+<h3 id="ssd-pascal-voc">SSD 基于Pascal VOC数据集</h3>
+<table>
+<thead>
+<tr>
+<th align="left">骨架网络</th>
+<th align="center">输入尺寸</th>
+<th align="center">每张GPU图片个数</th>
+<th align="center">学习率策略</th>
+<th align="center">推理时间(fps)</th>
+<th align="center">Box AP</th>
+<th align="center">下载</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">MobileNet v1</td>
+<td align="center">300</td>
+<td align="center">32</td>
+<td align="center">120e</td>
+<td align="center">159.543</td>
+<td align="center">73.2</td>
+<td align="center"><a href="https://paddlemodels.bj.bcebos.com/object_detection/ssd_mobilenet_v1_voc.tar">下载链接</a></td>
+</tr>
+<tr>
+<td align="left">VGG16</td>
+<td align="center">300</td>
+<td align="center">8</td>
+<td align="center">240e</td>
+<td align="center">117.279</td>
+<td align="center">77.5</td>
+<td align="center"><a href="https://paddlemodels.bj.bcebos.com/object_detection/ssd_vgg16_300_voc.tar">下载链接</a></td>
+</tr>
+<tr>
+<td align="left">VGG16</td>
+<td align="center">512</td>
+<td align="center">8</td>
+<td align="center">240e</td>
+<td align="center">65.975</td>
+<td align="center">80.2</td>
+<td align="center"><a href="https://paddlemodels.bj.bcebos.com/object_detection/ssd_vgg16_512_voc.tar">下载链接</a></td>
+</tr>
+</tbody>
+</table>
+<p><strong>注意事项:</strong> MobileNet-SSD在2卡，总batch size为64下训练120周期。VGG-SSD在总batch size为32下训练240周期。数据增强包括：随机颜色失真，随机剪裁，随机扩张，随机翻转。</p>
+<h2 id="_9">人脸检测</h2>
+<p>详细请参考<a href="../configs/face_detection">人脸检测模型</a>。</p>
+<h2 id="open-images-v5">基于Open Images V5数据集的物体检测</h2>
+<p>详细请参考<a href="../OIDV5_BASELINE_MODEL/">Open Images V5数据集基线模型</a>。</p>
+              
+            </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+      
+      
+    </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../mathjax-config.js" defer></script>
+      <script src="../MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+      <script src="../search/main.js" defer></script>
+
+</body>
+</html>

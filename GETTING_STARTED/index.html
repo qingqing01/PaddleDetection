@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  <link rel="shortcut icon" href="../img/favicon.ico">
+  <title>GETTING STARTED - PaddleDetection Docs</title>
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "GETTING STARTED";
+    var mkdocs_page_input_path = "GETTING_STARTED.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> PaddleDetection Docs</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="current">
+	  
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../index.md">Home</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../docs/INSTALL.md">Installation</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../docs/QUICK_STARTED.md">Quick start</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../docs/MODEL_ZOO.md">Modle Zoo</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <span class="caption-text">Deployment</span>
+    <ul class="subnav">
+                <li class="">
+                    
+    <a class="" href="../docs/EXPORT_MODEL.md">Export model</a>
+                </li>
+    </ul>
+	    </li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">PaddleDetection Docs</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>GETTING STARTED</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <p>English | <a href="../GETTING_STARTED_cn/">简体中文</a></p>
+<h1 id="getting-started">Getting Started</h1>
+<p>For setting up the running environment, please refer to <a href="../INSTALL/">installation
+instructions</a>.</p>
+<h2 id="trainingevaluationinference">Training/Evaluation/Inference</h2>
+<p>PaddleDetection provides scripots for training, evalution and inference with various features according to different configure.</p>
+<pre><code class="bash"># set PYTHONPATH
+export PYTHONPATH=$PYTHONPATH:.
+# training in single-GPU and multi-GPU. specify different GPU numbers by CUDA_VISIBLE_DEVICES
+export CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7
+python tools/train.py -c configs/faster_rcnn_r50_1x.yml
+# GPU evalution
+export CUDA_VISIBLE_DEVICES=0
+python tools/eval.py -c configs/faster_rcnn_r50_1x.yml
+# Inference
+python tools/infer.py -c configs/faster_rcnn_r50_1x.yml --infer_img=demo/000000570688.jpg
+</code></pre>
+
+<h3 id="optional-argument-list">Optional argument list</h3>
+<p>list below can be viewed by <code>--help</code></p>
+<table>
+<thead>
+<tr>
+<th align="center">FLAG</th>
+<th align="center">script supported</th>
+<th align="center">description</th>
+<th align="center">default</th>
+<th align="center">remark</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">-c</td>
+<td align="center">ALL</td>
+<td align="center">Select config file</td>
+<td align="center">None</td>
+<td align="center"><strong>The whole description of configure can refer to <a href="config_example">config_example</a></strong></td>
+</tr>
+<tr>
+<td align="center">-o</td>
+<td align="center">ALL</td>
+<td align="center">Set parameters in configure file</td>
+<td align="center">None</td>
+<td align="center"><code>-o</code> has higher priority to file configured by <code>-c</code>. Such as <code>-o use_gpu=False max_iter=10000</code></td>
+</tr>
+<tr>
+<td align="center">-r/--resume_checkpoint</td>
+<td align="center">train</td>
+<td align="center">Checkpoint path for resuming training</td>
+<td align="center">None</td>
+<td align="center"><code>-r output/faster_rcnn_r50_1x/10000</code></td>
+</tr>
+<tr>
+<td align="center">--eval</td>
+<td align="center">train</td>
+<td align="center">Whether to perform evaluation in training</td>
+<td align="center">False</td>
+<td align="center"></td>
+</tr>
+<tr>
+<td align="center">--output_eval</td>
+<td align="center">train/eval</td>
+<td align="center">json path in evalution</td>
+<td align="center">current path</td>
+<td align="center"><code>--output_eval ./json_result</code></td>
+</tr>
+<tr>
+<td align="center">-d/--dataset_dir</td>
+<td align="center">train/eval</td>
+<td align="center">path for dataset, same as dataset_dir in configs</td>
+<td align="center">None</td>
+<td align="center"><code>-d dataset/coco</code></td>
+</tr>
+<tr>
+<td align="center">--fp16</td>
+<td align="center">train</td>
+<td align="center">Whether to enable mixed precision training</td>
+<td align="center">False</td>
+<td align="center">GPU training is required</td>
+</tr>
+<tr>
+<td align="center">--loss_scale</td>
+<td align="center">train</td>
+<td align="center">Loss scaling factor for mixed precision training</td>
+<td align="center">8.0</td>
+<td align="center">enable when <code>--fp16</code> is True</td>
+</tr>
+<tr>
+<td align="center">--json_eval</td>
+<td align="center">eval</td>
+<td align="center">Whether to evaluate with already existed bbox.json or mask.json</td>
+<td align="center">False</td>
+<td align="center">json path is set in <code>--output_eval</code></td>
+</tr>
+<tr>
+<td align="center">--output_dir</td>
+<td align="center">infer</td>
+<td align="center">Directory for storing the output visualization files</td>
+<td align="center"><code>./output</code></td>
+<td align="center"><code>--output_dir output</code></td>
+</tr>
+<tr>
+<td align="center">--draw_threshold</td>
+<td align="center">infer</td>
+<td align="center">Threshold to reserve the result for visualization</td>
+<td align="center">0.5</td>
+<td align="center"><code>--draw_threshold 0.7</code></td>
+</tr>
+<tr>
+<td align="center">--infer_dir</td>
+<td align="center">infer</td>
+<td align="center">Directory for images to perform inference on</td>
+<td align="center">None</td>
+<td align="center"></td>
+</tr>
+<tr>
+<td align="center">--infer_img</td>
+<td align="center">infer</td>
+<td align="center">Image path</td>
+<td align="center">None</td>
+<td align="center">higher priority over --infer_dir</td>
+</tr>
+<tr>
+<td align="center">--use_tb</td>
+<td align="center">train/infer</td>
+<td align="center">Whether to record the data with <a href="https://github.com/linshuliang/tb-paddle">tb-paddle</a>, so as to display in Tensorboard</td>
+<td align="center">False</td>
+<td align="center"></td>
+</tr>
+<tr>
+<td align="center">--tb_log_dir</td>
+<td align="center">train/infer</td>
+<td align="center">tb-paddle logging directory for image</td>
+<td align="center">train:<code>tb_log_dir/scalar</code> infer: <code>tb_log_dir/image</code></td>
+<td align="center"></td>
+</tr>
+</tbody>
+</table>
+<h2 id="examples">Examples</h2>
+<h3 id="training">Training</h3>
+<ul>
+<li>Perform evaluation in training</li>
+</ul>
+<p><code>bash
+  export CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7
+  python -u tools/train.py -c configs/faster_rcnn_r50_1x.yml --eval</code></p>
+<p>Perform training and evalution alternatively and evaluate at each snapshot_iter. Meanwhile, the best model with highest MAP is saved at each <code>snapshot_iter</code> which has the same path as <code>model_final</code>.</p>
+<p>If evaluation dataset is large, we suggest decreasing evaluation times or evaluating after training.</p>
+<ul>
+<li>Fine-tune other task</li>
+</ul>
+<p>When using pre-trained model to fine-tune other task, two methods can be used:</p>
+<ol>
+<li>The excluded pre-trained parameters can be set by <code>finetune_exclude_pretrained_params</code> in YAML config</li>
+<li>Set -o finetune_exclude_pretrained_params in the arguments.</li>
+</ol>
+<p><code>bash
+  export CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7
+  python -u tools/train.py -c configs/faster_rcnn_r50_1x.yml \
+                           -o pretrain_weights=output/faster_rcnn_r50_1x/model_final/ \
+                              finetune_exclude_pretrained_params = ['cls_score','bbox_pred']</code></p>
+<h5 id="notes">NOTES</h5>
+<ul>
+<li><code>CUDA_VISIBLE_DEVICES</code> can specify different gpu numbers. Such as: <code>export CUDA_VISIBLE_DEVICES=0,1,2,3</code>. GPU calculation rules can refer <a href="#faq">FAQ</a></li>
+<li>Dataset will be downloaded automatically and cached in <code>~/.cache/paddle/dataset</code> if not be found locally.</li>
+<li>Pretrained model is downloaded automatically and cached in <code>~/.cache/paddle/weights</code>.</li>
+<li>Checkpoints are saved in <code>output</code> by default, and can be revised from save_dir in configure files.</li>
+<li>RCNN models training on CPU is not supported on PaddlePaddle&lt;=1.5.1 and will be fixed on later version.</li>
+</ul>
+<h3 id="mixed-precision-training">Mixed Precision Training</h3>
+<p>Mixed precision training can be enabled with <code>--fp16</code> flag. Currently Faster-FPN, Mask-FPN and Yolov3 have been verified to be working with little to no loss of precision (less than 0.2 mAP)</p>
+<p>To speed up mixed precision training, it is recommended to train in multi-process mode, for example</p>
+<pre><code class="bash">python -m paddle.distributed.launch --selected_gpus 0,1,2,3,4,5,6,7 tools/train.py --fp16 -c configs/faster_rcnn_r50_fpn_1x.yml
+</code></pre>
+
+<p>If loss becomes <code>NaN</code> during training, try tweak the <code>--loss_scale</code> value. Please refer to the Nvidia <a href="https://docs.nvidia.com/deeplearning/sdk/mixed-precision-training/index.html#mptrain">documentation</a> on mixed precision training for details.</p>
+<p>Also, please note mixed precision training currently requires changing <code>norm_type</code> from <code>affine_channel</code> to <code>bn</code>.</p>
+<h3 id="evaluation">Evaluation</h3>
+<ul>
+<li>Evaluate by specified weights path and dataset path</li>
+</ul>
+<p><code>bash
+  export CUDA_VISIBLE_DEVICES=0
+  python -u tools/eval.py -c configs/faster_rcnn_r50_1x.yml \
+                          -o weights=https://paddlemodels.bj.bcebos.com/object_detection/faster_rcnn_r50_1x.tar \
+                          -d dataset/coco</code></p>
+<p>The path of model to be evaluted can be both local path and link in <a href="../MODEL_ZOO_cn/">MODEL_ZOO</a>.</p>
+<ul>
+<li>Evaluate with json</li>
+</ul>
+<p><code>bash
+  export CUDA_VISIBLE_DEVICES=0
+  python tools/eval.py -c configs/faster_rcnn_r50_1x.yml \
+             --json_eval \
+             -f evaluation/</code></p>
+<p>The json file must be named bbox.json or mask.json, placed in the <code>evaluation/</code> directory.</p>
+<h4 id="notes_1">NOTES</h4>
+<ul>
+<li>Multi-GPU evaluation for R-CNN and SSD models is not supported at the
+moment, but it is a planned feature</li>
+</ul>
+<h3 id="inference">Inference</h3>
+<ul>
+<li>Output specified directory &amp;&amp; Set up threshold</li>
+</ul>
+<p><code>bash
+  export CUDA_VISIBLE_DEVICES=0
+  python tools/infer.py -c configs/faster_rcnn_r50_1x.yml \
+                      --infer_img=demo/000000570688.jpg \
+                      --output_dir=infer_output/ \
+                      --draw_threshold=0.5 \
+                      -o weights=output/faster_rcnn_r50_1x/model_final \
+                      --use_tb=Ture</code></p>
+<p><code>--draw_threshold</code> is an optional argument. Default is 0.5.
+  Different thresholds will produce different results depending on the calculation of <a href="https://ieeexplore.ieee.org/document/1699659">NMS</a>.</p>
+<ul>
+<li>Export model</li>
+</ul>
+<p><code>bash
+  python tools/export_model.py -c configs/faster_rcnn_r50_1x.yml \
+                      --output_dir=inference_model \
+                      -o weights=output/faster_rcnn_r50_1x/model_final \
+                         FasterRCNNTestFeed.image_shape=[3,800,1333]</code></p>
+<p>Save inference model <code>tools/export_model.py</code>, which can be loaded by PaddlePaddle predict library.</p>
+<h2 id="faq">FAQ</h2>
+<p><strong>Q:</strong>  Why do I get <code>NaN</code> loss values during single GPU training? </br>
+<strong>A:</strong>  The default learning rate is tuned to multi-GPU training (8x GPUs), it must
+be adapted for single GPU training accordingly (e.g., divide by 8).
+The calculation rules are as follows，they are equivalent: </br></p>
+<table>
+<thead>
+<tr>
+<th align="center">GPU number</th>
+<th align="center">Learning rate</th>
+<th align="center">Max_iters</th>
+<th align="center">Milestones</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">2</td>
+<td align="center">0.0025</td>
+<td align="center">720000</td>
+<td align="center">[480000, 640000]</td>
+</tr>
+<tr>
+<td align="center">4</td>
+<td align="center">0.005</td>
+<td align="center">360000</td>
+<td align="center">[240000, 320000]</td>
+</tr>
+<tr>
+<td align="center">8</td>
+<td align="center">0.01</td>
+<td align="center">180000</td>
+<td align="center">[120000, 160000]</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Q:</strong>  How to reduce GPU memory usage? </br>
+<strong>A:</strong>  Setting environment variable FLAGS_conv_workspace_size_limit to a smaller
+number can reduce GPU memory footprint without affecting training speed.
+Take Mask-RCNN (R50) as example, by setting <code>export FLAGS_conv_workspace_size_limit=512</code>,
+batch size could reach 4 per GPU (Tesla V100 16GB).</p>
+<p><strong>Q:</strong>  How to change data preprocessing? </br>
+<strong>A:</strong>  Set <code>sample_transform</code> in configuration. Note that <strong>the whole transforms</strong> need to be added in configuration.
+For example, <code>DecodeImage</code>, <code>NormalizeImage</code> and <code>Permute</code> in RCNN models. For detail description, please refer
+to <a href="config_example">config_example</a>.</p>
+              
+            </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+      
+      
+    </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../mathjax-config.js" defer></script>
+      <script src="../MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+      <script src="../search/main.js" defer></script>
+
+</body>
+</html>
