@@ -36,13 +36,9 @@
 
 支持的模型结构：
 
-
-| Backbones      | 算法      | 端侧模型        | 优化组件        | 数据增强     |
-| ---------| -------------------| -------| -----------------| ------------|
-| ResNet/ResNet-vd<br />ResNet-vd/ResNeXt-vd<br />SENet<br />Res2Net<br />HRNet<br />Hourglass<br /><br />CBNet<br />GCNet<br />DarkNet<br />CSPDarkNet<br />VGG<br />MobileNetv1<br />MobileNet2<br /> | Faster R-CNN <br />Mask R-CNN<br />Cascade R-CNN<br />Cascade Mask R-CNN<br />Libra R-CNN<br />Hybrid Task Cascade<br /><br />PSS-DET RCNN <br />LiRetinaNet<br />SSD<br />YOLOv3<br />YOLOv4<br />PP-YOLO<br />EfficentDet<br />CornerNet-Squeeze<br />FCOS<br />TTFNet<br /><br />FaceBoxes<br />BlazeFace<br />BlazeFace-NAS | MobileNetv3-SSDLite<br />MobileNetv3-RCNN<br />Pruned MobileNetv3-YOLOv3 | FP16训练<br />多机训练<br />Sync-BN<br /><br />Group Normalization<br />DCNv2<br />Non-local<br />BIFPN<br /><br />BFP<br />HRFPN<br />ACFPN<br /><br />GIOU/DIoU/CIoU<br />IoU-aware | Random Flipping<br />Random Erasing<br /><br />Random Distort<br />Random Expand<br /><br />Random Crop<br />Random Interp<br />Random Resize<br />MixUp<br />Cutmix<br />Grid Mask<br />Auto Augment<br /> |
-
-
-
+| Backbones                                                    | 算法                                                         | 优化组件                                                     | 数据增强                                                     | 数据集                                                       |
+| ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| ResNet<br />ResNet-vd<br />ResNet-vd<br />ResNeXt-vd<br />SENet<br />Res2Net<br />HRNet<br />Hourglass<br />CBNet<br />GCNet<br />DarkNet<br />CSPDarkNet<br />VGG<br />MobileNetv1<br />MobileNet2<br /> | Faster R-CNN <br />Mask R-CNN<br />Cascade R-CNN<br />Cascade Mask R-CNN<br />Libra R-CNN<br />Hybrid Task Cascade<br />PSS-DET RCNN <br />RetinaNet<br />SSD<br />YOLOv3<br />YOLOv4<br />PP-YOLO<br />EfficentDet<br />CornerNet-Squeeze<br />FCOS<br />TTFNet<br />FaceBoxes<br />BlazeFace<br />BlazeFace-NAS | FP16训练<br />多机训练<br />Sync-BN<br />Group Normalization<br />DCNv2<br />Non-local<br />BIFPN<br />BFP<br />HRFPN<br />ACFPN<br />SPP<br />DropBlock<br />CoordConv<br />GIOU/DIoU/CIoU<br />IoU-aware<br />SoftNMS<br />MatrixNMS<br /> | Random Flipping<br />Random Erasing<br /><br />Random Distort<br />Random Expand<br />Random Crop<br />Random Interp<br />Random Resize<br />Mixup<br />Cutmix<br />Grid Mask<br />Auto Augment<br /> | COCO<br />Pascal VOC<br />Object365<br />OpenImages<br />WIDERFace |
 
 
 <a name="vd">[1]</a> [ResNet-vd](https://arxiv.org/pdf/1812.01187) 模型预测速度基本不变的情况下提高了精度。
