@@ -30,13 +30,8 @@ class YOLOv3(BaseArch):
         self.post_process = post_process
 
     def model_arch(self, ):
-        # Backbone
         body_feats = self.backbone(self.inputs)
-
-        # neck
         body_feats = self.neck(body_feats)
-
-        # YOLO Head
         self.yolo_head_outs = self.yolo_head(body_feats)
 
     def get_loss(self, ):

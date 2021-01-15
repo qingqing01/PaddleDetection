@@ -17,10 +17,17 @@ from ppdet.core.workspace import register
 from ppdet.modeling import ops
 
 
+def _to_list(v):
+    if not isinstance(v, (list, tuple)):
+        return [v]
+    return v
+
+
 @register
 class RoIAlign(object):
     def __init__(self,
                  resolution=14,
+                 spatial_scale=0.0625,
                  sampling_ratio=0,
                  canconical_level=4,
                  canonical_size=224,
@@ -28,20 +35,20 @@ class RoIAlign(object):
                  end_level=3):
         super(RoIAlign, self).__init__()
         self.resolution = resolution
+        self.spatial_scale = _to_list(spatial_scale)
         self.sampling_ratio = sampling_ratio
         self.canconical_level = canconical_level
         self.canonical_size = canonical_size
         self.start_level = start_level
         self.end_level = end_level
 
-    def __call__(self, feats, rois, spatial_scale):
-        roi, rois_num = rois
-        if self.start_level == self.end_level:
+    def __call__(self, feats, roi, rois_num):
+        if len(feats) == 1:
             rois_feat = ops.roi_align(
                 feats[self.start_level],
                 roi,
                 self.resolution,
-                spatial_scale,
+                self.spatial_scale[0],
                 rois_num=rois_num)
         else:
             offset = 2
@@ -60,7 +67,7 @@ class RoIAlign(object):
                     feats[lvl],
                     rois_dist[lvl],
                     self.resolution,
-                    spatial_scale[lvl],
+                    self.spatial_scale[lvl],
                     sampling_ratio=self.sampling_ratio,
                     rois_num=rois_num_dist[lvl])
                 rois_feat_list.append(roi_feat)
@@ -68,3 +75,7 @@ class RoIAlign(object):
             rois_feat = paddle.gather(rois_feat_shuffle, restore_index)
 
         return rois_feat
+
+    @classmethod
+    def from_config(cls, cfg, input_shape):
+        return {'spatial_scale': [1. / i.stride for i in input_shape]}

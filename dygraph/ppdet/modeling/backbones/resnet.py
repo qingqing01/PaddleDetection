@@ -13,18 +13,17 @@
 # limitations under the License.
 
 import numpy as np
-from paddle import ParamAttr
+from numbers import Integral
+
 import paddle
 import paddle.nn as nn
 import paddle.nn.functional as F
-from paddle.nn import Conv2D, BatchNorm
-from paddle.nn import MaxPool2D
+from paddle.regularizer import L2Decay
 
 from ppdet.core.workspace import register, serializable
 
-from paddle.regularizer import L2Decay
 from .name_adapter import NameAdapter
-from numbers import Integral
+from ..shape_spec import ShapeSpec
 
 __all__ = ['ResNet', 'Res5Head']
 
@@ -47,32 +46,33 @@ class ConvNormLayer(nn.Layer):
         self.norm_type = norm_type
         self.act = act
 
-        self.conv = Conv2D(
+        print(name)
+        self.conv = nn.Conv2D(
             in_channels=ch_in,
             out_channels=ch_out,
             kernel_size=filter_size,
             stride=stride,
             padding=(filter_size - 1) // 2,
             groups=1,
-            weight_attr=ParamAttr(
+            weight_attr=paddle.ParamAttr(
                 learning_rate=lr, name=name + "_weights"),
             bias_attr=False)
 
         bn_name = name_adapter.fix_conv_norm_name(name)
         norm_lr = 0. if freeze_norm else lr
-        param_attr = ParamAttr(
+        param_attr = paddle.ParamAttr(
             learning_rate=norm_lr,
             regularizer=L2Decay(norm_decay),
             name=bn_name + "_scale",
             trainable=False if freeze_norm else True)
-        bias_attr = ParamAttr(
+        bias_attr = paddle.ParamAttr(
             learning_rate=norm_lr,
             regularizer=L2Decay(norm_decay),
             name=bn_name + "_offset",
             trainable=False if freeze_norm else True)
 
         global_stats = True if freeze_norm else False
-        self.norm = BatchNorm(
+        self.norm = nn.BatchNorm(
             ch_out,
             act=act,
             param_attr=param_attr,
@@ -269,6 +269,7 @@ class ResNet(nn.Layer):
             conv_def = [[3, 64, 7, 2, conv1_name]]
         self.conv1 = nn.Sequential()
         for (c_in, c_out, k, s, _name) in conv_def:
+            print(_name)
             self.conv1.add_sublayer(
                 _name,
                 ConvNormLayer(
@@ -284,10 +285,14 @@ class ResNet(nn.Layer):
                     lr=lr_mult,
                     name=_name))
 
-        self.pool = MaxPool2D(kernel_size=3, stride=2, padding=1)
+        self.pool = nn.MaxPool2D(kernel_size=3, stride=2, padding=1)
 
         ch_in_list = [64, 256, 512, 1024]
         ch_out_list = [64, 128, 256, 512]
+
+        self.expansion = 4  # 4 if dept >= 50 else 1
+        self._out_channels = [4 * v for v in ch_out_list]
+        self._out_strides = [4, 8, 16, 32]
 
         self.res_layers = []
         for i in range(num_stages):
@@ -307,6 +312,14 @@ class ResNet(nn.Layer):
                     freeze_norm=freeze_norm))
             self.res_layers.append(res_layer)
 
+    @property
+    def out_shape(self):
+        return [
+            ShapeSpec(
+                channels=self._out_channels[i], stride=self._out_strides[i])
+            for i in self.return_idx
+        ]
+
     def forward(self, inputs):
         x = inputs['image']
         conv1 = self.conv1(x)
@@ -323,15 +336,21 @@ class ResNet(nn.Layer):
 
 @register
 class Res5Head(nn.Layer):
-    def __init__(self, feat_in=1024, feat_out=512):
+    def __init__(self, depth=50):
         super(Res5Head, self).__init__()
+        chs = {50: [1024, 512], }
         na = NameAdapter(self)
-        self.res5_conv = []
+        feat_in, feat_out = chs[depth]
         self.res5 = self.add_sublayer(
             'res5_roi_feat',
             Blocks(
                 feat_in, feat_out, count=3, name_adapter=na, stage_num=5))
         self.feat_out = feat_out * 4
+
+    def out_shape(self):
+        return [ShapeSpec(
+            channels=self.feat_out,
+            stride=32, )]
 
     def forward(self, roi_feat, stage=0):
         y = self.res5(roi_feat)

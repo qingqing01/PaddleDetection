@@ -165,7 +165,8 @@ def merge_config(config, another_cfg=None):
     Returns: global config
     """
     global global_config
-    dct = another_cfg if another_cfg is not None else global_config
+    #dct = another_cfg if another_cfg is not None else global_config
+    dct = another_cfg or global_config
     return dict_merge(dct, config)
 
 
@@ -230,11 +231,12 @@ def create(cls_or_name, **kwargs):
         isinstance(global_config[name], SchemaDict), \
         "the module {} is not registered".format(name)
     config = global_config[name]
-    config.update(kwargs)
-    config.validate()
+    #    config.update(kwargs)
+    #config.validate()
     cls = getattr(config.pymodule, name)
-    kwargs = {}
-    kwargs.update(global_config[name])
+
+    cls_kwargs = {}
+    cls_kwargs.update(global_config[name])
 
     # parse `shared` annoation of registered modules
     if getattr(config, 'shared', None):
@@ -248,11 +250,14 @@ def create(cls_or_name, **kwargs):
                 continue  # value is given for the module
             elif shared_conf.key in global_config:
                 # `key` is present in config
-                kwargs[k] = global_config[shared_conf.key]
+                cls_kwargs[k] = global_config[shared_conf.key]
             else:
-                kwargs[k] = shared_conf.default_value
+                cls_kwargs[k] = shared_conf.default_value
 
     # parse `inject` annoation of registered modules
+    if getattr(cls, 'from_config', None):
+        cls_kwargs.update(cls.from_config(config, **kwargs))
+
     if getattr(config, 'inject', None):
         for k in config.inject:
             target_key = config[k]
@@ -274,18 +279,18 @@ def create(cls_or_name, **kwargs):
                         continue
                     target[i] = v
                 if isinstance(target, SchemaDict):
-                    kwargs[k] = create(inject_name)
+                    cls_kwargs[k] = create(inject_name)
             elif isinstance(target_key, str):
                 if target_key not in global_config:
                     raise ValueError("Missing injection config:", target_key)
                 target = global_config[target_key]
                 if isinstance(target, SchemaDict):
-                    kwargs[k] = create(target_key)
+                    cls_kwargs[k] = create(target_key)
                 elif hasattr(target, '__dict__'):  # serialized object
-                    kwargs[k] = target
+                    cls_kwargs[k] = target
             else:
                 raise ValueError("Unsupported injection type:", target_key)
     # prevent modification of global config values of reference types
     # (e.g., list, dict) from within the created module instances
     #kwargs = copy.deepcopy(kwargs)
-    return cls(**kwargs)
+    return cls(**cls_kwargs)

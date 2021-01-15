@@ -44,7 +44,7 @@ class Anchor(object):
         anchors = paddle.concat(anchor_list)
         return rpn_scores, rpn_deltas, anchors
 
-    def generate_loss_inputs(self, inputs, rpn_head_out, anchors):
+    def label_and_samples(self, inputs, rpn_head_out, anchors):
         if len(rpn_head_out) != len(anchors):
             raise ValueError(
                 "rpn_head_out and anchors should have same length, "

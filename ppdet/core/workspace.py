@@ -256,9 +256,15 @@ def create(cls_or_name, **kwargs):
                 if target_key not in global_config:
                     raise ValueError("Missing injection config:", target_key)
                 target = global_config[target_key]
+                if k == 'bbox_assigner':
+                    print('target_key ', target_key, type(target))
                 if isinstance(target, SchemaDict):
+                    if k == 'bbox_assigner':
+                        print('target_key SchemaDict')
                     kwargs[k] = create(target_key)
                 elif hasattr(target, '__dict__'):  # serialized object
+                    if k == 'bbox_assigner':
+                        print('target_key attr doct')
                     kwargs[k] = target
             else:
                 raise ValueError("Unsupported injection type:", target_key)
@@ -266,3 +272,24 @@ def create(cls_or_name, **kwargs):
     # (e.g., list, dict) from within the created module instances
     kwargs = copy.deepcopy(kwargs)
     return cls(**kwargs)
+
+
+#def configurable(init_func=None, *):
+#    @functools.wraps(init_func)
+#    def wrapped(self, *args, **kwargs):
+#        try:
+#            from_config_func = type(self).from_config
+#        except AttributeError as e:
+#            raise AttributeError(
+#                "Class with @configurable must have a 'from_config' classmethod."
+#            ) from e
+#        if not inspect.ismethod(from_config_func):
+#            raise TypeError("Class with @configurable must have a 'from_config' classmethod.")
+#
+#        if _called_with_cfg(*args, **kwargs):
+#            explicit_args = _get_args_from_config(from_config_func, *args, **kwargs)
+#            init_func(self, **explicit_args)
+#        else:
+#            init_func(self, *args, **kwargs)
+#
+#    return wrapped

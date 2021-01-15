@@ -15,19 +15,16 @@ class BaseArch(nn.Layer):
     def __init__(self):
         super(BaseArch, self).__init__()
 
-    def forward(self, inputs, mode='infer'):
+    def forward(self, inputs):
         self.inputs = inputs
+        mode = 'train' if self.training else 'infer'
         self.inputs['mode'] = mode
         self.model_arch()
 
         if mode == 'train':
-            out = self.get_loss()
-        elif mode == 'infer':
-            out = self.get_pred()
+            return self.get_loss()
         else:
-            out = None
-            raise "Now, only support train and infer mode!"
-        return out
+            return self.get_pred()
 
     def build_inputs(self, data, input_def):
         inputs = {}
@@ -35,8 +32,8 @@ class BaseArch(nn.Layer):
             inputs[k] = data[i]
         return inputs
 
-    def model_arch(self):
-        raise NotImplementedError("Should implement model_arch method!")
+    def model_arch(self, ):
+        pass
 
     def get_loss(self, ):
         raise NotImplementedError("Should implement get_loss method!")

@@ -115,8 +115,12 @@ class ImageFolder(DetDataset):
                  sample_num=-1,
                  use_default_label=None,
                  **kwargs):
-        super(ImageFolder, self).__init__(dataset_dir, image_dir, anno_path,
-                                          sample_num, use_default_label)
+        super(ImageFolder, self).__init__(
+            dataset_dir,
+            image_dir,
+            anno_path,
+            sample_num=sample_num,
+            use_default_label=use_default_label)
         self._imid2path = {}
         self.roidbs = None
 

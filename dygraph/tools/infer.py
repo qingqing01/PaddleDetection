@@ -34,7 +34,7 @@ from ppdet.core.workspace import load_config, merge_config, create
 from ppdet.utils.check import check_gpu, check_version, check_config
 from ppdet.utils.visualizer import visualize_results
 from ppdet.utils.cli import ArgsParser
-from ppdet.utils.checkpoint import load_weight
+from ppdet.utils.checkpoint import load_weight, load_pretrain_weight
 from ppdet.utils.eval_utils import get_infer_results
 
 from ppdet.utils.logger import setup_logger
@@ -120,6 +120,10 @@ def get_test_images(infer_dir, infer_img):
 
 
 def run(FLAGS, cfg, place):
+    import random
+    random.seed(0)
+    np.random.seed(0)
+    paddle.seed(102)
 
     # Model
     main_arch = cfg.architecture
@@ -147,13 +151,14 @@ def run(FLAGS, cfg, place):
                                                 use_default_label)
 
     # Init Model
-    load_weight(model, cfg.weights)
-
+    #load_weight(model, cfg.weights)
+    load_pretrain_weight(model, cfg.pretrain_weights,
+                         cfg.get('load_static_weights', False), 'pretrain')
     # Run Infer 
     for iter_id, data in enumerate(test_loader):
         # forward
         model.eval()
-        outs = model(data, mode='infer')
+        outs = model(data)
         for key in extra_key:
             outs[key] = data[key]
         for key, value in outs.items():

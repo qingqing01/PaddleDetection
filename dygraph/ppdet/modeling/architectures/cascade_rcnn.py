@@ -133,7 +133,7 @@ class CascadeRCNN(BaseArch):
         loss = {}
 
         # RPN loss
-        rpn_loss_inputs = self.anchor.generate_loss_inputs(
+        rpn_loss_inputs = self.anchor.label_and_samples(
             self.inputs, self.rpn_head_out, self.anchor_out)
         loss_rpn = self.rpn_head.get_loss(rpn_loss_inputs)
         loss.update(loss_rpn)

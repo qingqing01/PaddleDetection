@@ -95,6 +95,7 @@ def run(FLAGS, cfg, place):
     if FLAGS.enable_ce:
         random.seed(0)
         np.random.seed(0)
+        paddle.seed(102)
 
     if ParallelEnv().nranks > 1:
         paddle.distributed.init_parallel_env()
@@ -154,7 +155,7 @@ def run(FLAGS, cfg, place):
             data_time.update(time.time() - end_time)
             # Model Forward
             model.train()
-            outputs = model(data, mode='train')
+            outputs = model(data)
             loss = outputs['loss']
             # Model Backward
             loss.backward()
@@ -193,11 +194,11 @@ def run(FLAGS, cfg, place):
             step_id += 1
             end_time = time.time()  # after copy outputs to CPU.
         # Save Stage 
-        if (ParallelEnv().local_rank == 0 and \
-            (cur_eid % cfg.snapshot_epoch) == 0) or (cur_eid + 1) == end_epoch:
-            save_name = str(
-                cur_eid) if cur_eid + 1 != end_epoch else "model_final"
-            save_model(model, optimizer, save_dir, save_name, cur_eid + 1)
+        #if (ParallelEnv().local_rank == 0 and \
+        #    (cur_eid % cfg.snapshot_epoch) == 0) or (cur_eid + 1) == end_epoch:
+        #    save_name = str(
+        #        cur_eid) if cur_eid + 1 != end_epoch else "model_final"
+        #    save_model(model, optimizer, save_dir, save_name, cur_eid + 1)
 
 
 def main():

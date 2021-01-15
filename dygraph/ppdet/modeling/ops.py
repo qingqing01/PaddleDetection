@@ -220,11 +220,11 @@ def roi_align(input,
                 name='rois', shape=[None, 4], dtype='float32')
             rois_num = paddle.static.data(name='rois_num', shape=[None], dtype='int32')
             align_out = ops.roi_align(input=x,
-                                               rois=rois,
-                                               ouput_size=(7, 7),
-                                               spatial_scale=0.5,
-                                               sampling_ratio=-1,
-                                               rois_num=rois_num)
+                                      rois=rois,
+                                      ouput_size=(7, 7),
+                                      spatial_scale=0.5,
+                                      sampling_ratio=-1,
+                                      rois_num=rois_num)
     """
     check_type(output_size, 'output_size', (int, tuple), 'roi_align')
     if isinstance(output_size, int):

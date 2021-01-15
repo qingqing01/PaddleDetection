@@ -3,16 +3,12 @@ pretrain_weights: https://paddle-imagenet-models-name.bj.bcebos.com/ResNet50_cos
 weights: output/faster_rcnn_r50_1x_coco/model_final.pdparams
 load_static_weights: True
 
-# Model Achitecture
 FasterRCNN:
-  # model anchor info flow
-  anchor: Anchor
-  proposal: Proposal
-  # model feat info flow
+  # anchor: Anchor
+  # proposal: Proposal
   backbone: ResNet
   rpn_head: RPNHead
   bbox_head: BBoxHead
-  # post process
   bbox_post_process: BBoxPostProcess
 
 
